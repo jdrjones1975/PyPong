@@ -9,6 +9,7 @@ the Pygame library. Every program that uses Pygame should start
 with these lines:
 '''
 
+
 # Import a library of functions called 'pygame'
 import pygame
 import random
@@ -25,7 +26,7 @@ RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GREY     = ( 128, 128, 128)
 
-SENS = 25 # Keyboard repeat interval constant
+SENS = 10 # Keyboard repeat interval constant, the lower the number the faster the paddle
 
 class Pong(pygame.sprite.Sprite):
     '''
@@ -49,7 +50,7 @@ class Pong(pygame.sprite.Sprite):
     def set_pong(self):
         self.rect.x = init_pong_x
         self.rect.y = init_pong_y
-        self.x_speed = 2 #random left or right needed here
+        self.x_speed = random.randrange(-2 , 3, 4) #random left or right needed here
         self.y_speed = random.randint(-5, 5) #random up or down
         
     def wall_bounce(self):
@@ -96,12 +97,18 @@ title = "PyPong"
 paddle_width = 10
 paddle_height = 80
 paddle_speed = 10
+
 pong_size = 10
+
+netwidth = 10
 
 hit_paddle = pygame.mixer.Sound('paddle.wav')
 hit_wall = pygame.mixer.Sound('wall.wav')
 point_score = pygame.mixer.Sound('miss.wav')
 
+score_down = 20 # how far down the score text is placed on the screen
+score_text_size = 60 # size of the scoreboard text
+max_score = 10 # play until someone gets the max_score
 
 # pong initialization variables
 init_pong_x = width / 2
@@ -116,7 +123,7 @@ init_l_paddle_y = (height / 2) - (paddle_height / 2)
 init_r_paddle_x = width - (2*paddle_width)
 init_r_paddle_y = (height / 2) - (paddle_height / 2)
 
-
+# create the display
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption(title)
 
@@ -142,6 +149,21 @@ def paddle_bounce(paddle, pong):
         pong.y_speed = 5
     hit_paddle.play()
 
+# Select the font to use, size, bold, italics
+font = pygame.font.SysFont('Calibri', score_text_size, False, False)
+
+def draw_score(paddle):
+    return font.render(str(paddle.score), True, WHITE)
+
+def draw_net(screen):
+    pygame.draw.line(screen, GREY, [(width/2) - (netwidth/2), 0] , [(width/2) - (netwidth/2) , height], netwidth)
+
+def reset_all(pong, paddle1, paddle2):
+    pong.set_pong()
+    paddle1.score = 0
+    paddle2.score = 0
+
+
 # Create the pong
 pong = Pong(WHITE, pong_size, pong_size)
 pong.set_pong()
@@ -161,19 +183,34 @@ right_paddle.rect.y = init_r_paddle_y
 paddle_list.add(right_paddle)
 all_sprites_list.add(right_paddle)
 
-# Loop until the user clicks the close button.
-done = False
+# set the scores for rendering for each paddle
+left_paddle_score = draw_score(left_paddle)
+right_paddle_score = draw_score(right_paddle)
  
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
 
+# Set the repeat interval of held keys
 pygame.key.set_repeat(SENS, SENS)
 
-# Select the font to use, size, bold, italics
-
+# Loop until the user clicks the close button.
+done = False
 # -------- Main Program Loop -----------
 while not done:
     # --- Main event loop
+    for paddle in paddle_list:
+        if paddle.score == max_score:  #what to do at max_score--could end game or just reset and keep playing
+            reset_all(pong, left_paddle, right_paddle)
+            left_paddle_score = draw_score(left_paddle)
+            right_paddle_score = draw_score(right_paddle)
+            '''
+            pong.set_pong()
+            left_paddle.score = 0
+            right_paddle.score = 0
+            left_paddle_score = draw_score(left_paddle)
+            right_paddle_score = draw_score(right_paddle)
+            '''
+            
     for event in pygame.event.get(): # User did something
         
         if event.type == pygame.QUIT: # If user clicked close
@@ -192,9 +229,6 @@ while not done:
             if pygame.key.get_pressed()[pygame.K_m]:
                     right_paddle.rect.y += right_paddle.speed
 
-                
-    # above this, or they will be erased with this command.
-    screen.fill(BLACK)
 
     # move stuff
     pong.rect.x += pong.x_speed
@@ -220,19 +254,27 @@ while not done:
     # if the pong goes off the left, point for right paddle
     elif pong.rect.x <= 0 - pong_size:
         right_paddle.add_point(1)
+        right_paddle_score = draw_score(right_paddle)
         pong.score()
 
-        
     # if the pong goes off the right, point for the left paddle
     elif pong.rect.x >= width:
         left_paddle.add_point(1)
+        left_paddle_score = draw_score(left_paddle)
         pong.score()
 
-        
-    # update score if necessary
 
+    # --- Drawing code should go here
+    # First, clear the screen to white (or black, or whatever).
+    # Don't put other drawing commands
+    # above this, or they will be erased with this command.
+    screen.fill(BLACK)
+    draw_net(screen)
+    
     # draw the score
-
+    screen.blit(left_paddle_score, [width/4, score_down])
+    screen.blit(right_paddle_score, [3 * (width/4), score_down])
+    
     # Draw all sprites
     all_sprites_list.draw(screen)
 
