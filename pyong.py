@@ -101,7 +101,7 @@ player_right_down = pygame.K_m
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 
-size = (SCREEN_WIDTH, SCREEN_HEIGHT)
+SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 title = "PyPong"
 
 paddle_width = 10
@@ -131,7 +131,7 @@ init_r_paddle_x = SCREEN_WIDTH - (2*paddle_width)
 init_r_paddle_y = (SCREEN_HEIGHT / 2) - (paddle_height / 2)
 
 # create the display
-screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption(title)
 
 # Create lists to hold the sprites
