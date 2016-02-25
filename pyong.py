@@ -31,16 +31,20 @@ SENS = 10 # Keyboard repeat interval constant, the lower the number the faster t
 
 class Pong(pygame.sprite.Sprite):
     '''
-    This will be the pong ball class.
+    Class for the pong ball.
+    Pong(color, size=10)
     '''
-    def __init__(self, color, size):
+    def __init__(self, color, size=10):
         # Call to parent class
         super().__init__()
 
+        # Class attributions
+        self.color = color
+        self.size = size
         
         #load the image
-        self.image = pygame.Surface([size, size]).convert()
-        self.image.fill(color)
+        self.image = pygame.Surface([self.size, self.size]).convert()
+        self.image.fill(self.color)
 
 
         #set transparent color
@@ -108,7 +112,6 @@ paddle_width = 10
 paddle_height = 80
 paddle_speed = 10
 
-pong_size = 10
 
 netwidth = 10
 
@@ -172,7 +175,7 @@ def reset_all(pong, paddle1, paddle2):
 
 
 # Create the pong
-pong = Pong(WHITE, pong_size)
+pong = Pong(WHITE, size=10)
 pong.set_pong()
 all_sprites_list.add(pong)
 
@@ -252,7 +255,7 @@ while not done:
         paddle_bounce(right_paddle, pong)
 
     # if the pong hits the bottom of the screen
-    elif pong.rect.y >= SCREEN_HEIGHT - pong_size:
+    elif pong.rect.y >= SCREEN_HEIGHT - pong.size:
         pong.wall_bounce()
         
     # if the pong hits the top of the screen
@@ -260,7 +263,7 @@ while not done:
         pong.wall_bounce()
 
     # if the pong goes off the left, point for right paddle
-    elif pong.rect.x <= 0 - pong_size:
+    elif pong.rect.x <= 0 - pong.size:
         right_paddle.add_point(1)
         right_paddle_score = draw_score(right_paddle)
         pong.score()
