@@ -89,6 +89,12 @@ class Paddle(pygame.sprite.Sprite):
     def add_point(self, point):
         self.score += point
 
+# player input configuration
+player_left_up = pygame.K_a
+player_left_down = pygame.K_z
+player_right_up = pygame.K_k
+player_right_down = pygame.K_m
+
 width = 640
 height = 480
 
@@ -221,13 +227,13 @@ while not done:
         # move simultaneously
         
         elif event.type == pygame.KEYDOWN:
-            if pygame.key.get_pressed()[pygame.K_a]:
+            if pygame.key.get_pressed()[player_left_up]:
                     left_paddle.rect.y -= left_paddle.speed
-            if pygame.key.get_pressed()[pygame.K_z]:
+            if pygame.key.get_pressed()[player_left_down]:
                     left_paddle.rect.y += left_paddle.speed
-            if pygame.key.get_pressed()[pygame.K_k]:
+            if pygame.key.get_pressed()[player_right_up]:
                     right_paddle.rect.y -= right_paddle.speed
-            if pygame.key.get_pressed()[pygame.K_m]:
+            if pygame.key.get_pressed()[player_right_down]:
                     right_paddle.rect.y += right_paddle.speed
 
 
