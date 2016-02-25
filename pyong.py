@@ -33,12 +33,13 @@ class Pong(pygame.sprite.Sprite):
     '''
     This will be the pong ball class.
     '''
-    def __init__(self, color, width, height):
+    def __init__(self, color, size):
         # Call to parent class
         super().__init__()
+
         
         #load the image
-        self.image = pygame.Surface([width, height]).convert()
+        self.image = pygame.Surface([size, size]).convert()
         self.image.fill(color)
 
 
@@ -171,7 +172,7 @@ def reset_all(pong, paddle1, paddle2):
 
 
 # Create the pong
-pong = Pong(WHITE, pong_size, pong_size)
+pong = Pong(WHITE, pong_size)
 pong.set_pong()
 all_sprites_list.add(pong)
 
