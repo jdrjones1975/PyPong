@@ -71,15 +71,26 @@ class Pong(pygame.sprite.Sprite):
 
 class Paddle(pygame.sprite.Sprite):
     '''
-    This will be the paddle class.
+    Class for paddle
+    Paddle(paddle_x, paddle_y, color=WHITE, paddle_width=10, paddle_height=80, paddle_speed=10)
     '''
-    def __init__(self, color, width, height, paddle_x, paddle_y, speed):
+    def __init__(self, paddle_x, paddle_y
+                 , color = WHITE, paddle_width = 10, paddle_height = 80, paddle_speed = 10):
         # Call to parent class
         super().__init__()
+
+        # Class attributions
+        self.color = color
+        self.width = paddle_width
+        self.height = paddle_height
+        self.speed = paddle_speed
         
+        # score keeper
+        self.score = 0
+
         #load the image
-        self.image = pygame.Surface([width, height]).convert()
-        self.image.fill(color)
+        self.image = pygame.Surface([self.width, self.height]).convert()
+        self.image.fill(self.color)
 
 
         #set transparent color
@@ -87,11 +98,8 @@ class Paddle(pygame.sprite.Sprite):
 
         #Fetch the image rect.
         self.rect = self.image.get_rect()
-
-        # score keeper
-        self.score = 0
-
-        self.speed = speed
+        self.rect.x = paddle_x
+        self.rect.y = paddle_y
 
     def add_point(self, point):
         self.score += point
@@ -108,11 +116,6 @@ SCREEN_HEIGHT = 480
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 title = "PyPong"
 
-paddle_width = 10
-paddle_height = 80
-paddle_speed = 10
-
-
 netwidth = 10
 
 hit_paddle = pygame.mixer.Sound('paddle.wav')
@@ -124,14 +127,6 @@ score_text_size = 60 # size of the scoreboard text
 max_score = 10 # play until someone gets the max_score
 
 
-# Left paddle init variables
-init_l_paddle_x = 10
-init_l_paddle_y = (SCREEN_HEIGHT / 2) - (paddle_height / 2)
-
-
-# Right paddle init variables
-init_r_paddle_x = SCREEN_WIDTH - (2*paddle_width)
-init_r_paddle_y = (SCREEN_HEIGHT / 2) - (paddle_height / 2)
 
 # create the display
 screen = pygame.display.set_mode(SCREEN_SIZE)
@@ -147,13 +142,13 @@ def paddle_bounce(paddle, pong):
     elif pong.x_speed < 0:
         pong.x_speed -=1
     pong.x_speed *= -1
-    if pong.rect.y < ( paddle_height/5 + paddle.rect.y ):
+    if pong.rect.y < ( paddle.height/5 + paddle.rect.y ):
         pong.y_speed = -5
-    elif pong.rect.y > (paddle_height/5 + paddle.rect.y) and pong.rect.y < (2 * (paddle_height/5) + paddle.rect.y ):
+    elif pong.rect.y > (paddle.height/5 + paddle.rect.y) and pong.rect.y < (2 * (paddle.height/5) + paddle.rect.y ):
         pong.y_speed = -3
-    elif pong.rect.y > (2 * (paddle_height/5) + paddle.rect.y ) and pong.rect.y < (3 * (paddle_height/5) + paddle.rect.y):
+    elif pong.rect.y > (2 * (paddle.height/5) + paddle.rect.y ) and pong.rect.y < (3 * (paddle.height/5) + paddle.rect.y):
         pong.y_speed = 0
-    elif pong.rect.y > (3 * (paddle_height/5) + paddle.rect.y) and pong.rect.y < (4 * (paddle_height/5) + paddle.rect.y):
+    elif pong.rect.y > (3 * (paddle.height/5) + paddle.rect.y) and pong.rect.y < (4 * (paddle.height/5) + paddle.rect.y):
         pong.y_speed = 3
     else:
         pong.y_speed = 5
@@ -179,17 +174,33 @@ pong = Pong(WHITE, size=10)
 pong.set_pong()
 all_sprites_list.add(pong)
 
+
+def get_center_y(screen_height, paddle_height):
+    '''
+    Returns the y axis where object, if drawn, will sit on the center of screen
+    '''
+    return (screen_height / 2) - (paddle_height / 2)
+
+paddle_width = 10
+paddle_height = 80
+
+# Set initial position of paddle
+left_paddle_init_x = paddle_width # magic number ?
+left_paddle_init_y = get_center_y(SCREEN_HEIGHT, paddle_height)
+
+# Set initial position of paddle
+right_paddle_init_x = SCREEN_WIDTH - (2 * paddle_width) # magic number ?
+right_paddle_init_y = get_center_y(SCREEN_HEIGHT, paddle_height)
+
 # Create the left paddle
-left_paddle = Paddle(WHITE, paddle_width, paddle_height, init_l_paddle_x, init_l_paddle_y, paddle_speed)
-left_paddle.rect.x = init_l_paddle_x
-left_paddle.rect.y = init_l_paddle_y
+left_paddle = Paddle(paddle_x=left_paddle_init_x, paddle_y=left_paddle_init_y)
+
+# Create the right paddle
+right_paddle = Paddle(paddle_x=right_paddle_init_x, paddle_y=right_paddle_init_y)
+
 paddle_list.add(left_paddle)
 all_sprites_list.add(left_paddle)
 
-# Create the right paddle
-right_paddle = Paddle(WHITE, paddle_width, paddle_height, init_r_paddle_x, init_r_paddle_y, paddle_speed)
-right_paddle.rect.x = init_r_paddle_x
-right_paddle.rect.y = init_r_paddle_y
 paddle_list.add(right_paddle)
 all_sprites_list.add(right_paddle)
 
@@ -298,4 +309,3 @@ while not done:
 pygame.quit() #required to actually quit and close the window without hanging
 
 
-            
