@@ -227,13 +227,14 @@ while not done:
         # move simultaneously
         
         elif event.type == pygame.KEYDOWN:
-            if pygame.key.get_pressed()[player_left_up]:
+            key = pygame.key.get_pressed()
+            if key[player_left_up]:
                     left_paddle.rect.y -= left_paddle.speed
-            if pygame.key.get_pressed()[player_left_down]:
+            if key[player_left_down]:
                     left_paddle.rect.y += left_paddle.speed
-            if pygame.key.get_pressed()[player_right_up]:
+            if key[player_right_up]:
                     right_paddle.rect.y -= right_paddle.speed
-            if pygame.key.get_pressed()[player_right_down]:
+            if key[player_right_down]:
                     right_paddle.rect.y += right_paddle.speed
 
 
