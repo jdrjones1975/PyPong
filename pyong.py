@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #learning pygame from programarcadegames.com
 #pong game
 
@@ -30,15 +31,20 @@ SENS = 10 # Keyboard repeat interval constant, the lower the number the faster t
 
 class Pong(pygame.sprite.Sprite):
     '''
-    This will be the pong ball class.
+    Class for the pong ball.
+    Pong(color, size=10)
     '''
-    def __init__(self, color, width, height):
+    def __init__(self, color, size=10):
         # Call to parent class
         super().__init__()
+
+        # Class attributions
+        self.color = color
+        self.size = size
         
         #load the image
-        self.image = pygame.Surface([width, height]).convert()
-        self.image.fill(color)
+        self.image = pygame.Surface([self.size, self.size]).convert()
+        self.image.fill(self.color)
 
 
         #set transparent color
@@ -47,9 +53,11 @@ class Pong(pygame.sprite.Sprite):
         #Fetch the image rect.
         self.rect = self.image.get_rect()
 
-    def set_pong(self):
-        self.rect.x = init_pong_x
-        self.rect.y = init_pong_y
+    def reset_pos(self):
+        '''
+        Reset pong to center of screen, give random x, y speed
+        '''
+        self.rect.x, self.rect.y = SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2
         self.x_speed = random.randrange(-2 , 3, 4) #random left or right needed here
         self.y_speed = random.randint(-5, 5) #random up or down
         
@@ -59,19 +67,30 @@ class Pong(pygame.sprite.Sprite):
         
     def score(self):
         point_score.play()
-        self.set_pong()
+        self.reset_pos()
 
 class Paddle(pygame.sprite.Sprite):
     '''
-    This will be the paddle class.
+    Class for paddle
+    Paddle(paddle_x, paddle_y, color=WHITE, paddle_width=10, paddle_height=80, paddle_speed=10)
     '''
-    def __init__(self, color, width, height, paddle_x, paddle_y, speed):
+    def __init__(self, paddle_x, paddle_y
+                 , color = WHITE, paddle_width = 10, paddle_height = 80, paddle_speed = 10):
         # Call to parent class
         super().__init__()
+
+        # Class attributions
+        self.color = color
+        self.width = paddle_width
+        self.height = paddle_height
+        self.speed = paddle_speed
         
+        # score keeper
+        self.score = 0
+
         #load the image
-        self.image = pygame.Surface([width, height]).convert()
-        self.image.fill(color)
+        self.image = pygame.Surface([self.width, self.height]).convert()
+        self.image.fill(self.color)
 
 
         #set transparent color
@@ -79,26 +98,23 @@ class Paddle(pygame.sprite.Sprite):
 
         #Fetch the image rect.
         self.rect = self.image.get_rect()
-
-        # score keeper
-        self.score = 0
-
-        self.speed = speed
+        self.rect.x = paddle_x
+        self.rect.y = paddle_y
 
     def add_point(self, point):
         self.score += point
 
-width = 640
-height = 480
+# player input configuration
+player_left_up = pygame.K_a
+player_left_down = pygame.K_z
+player_right_up = pygame.K_k
+player_right_down = pygame.K_m
 
-size = (width, height)
+SCREEN_WIDTH = 640
+SCREEN_HEIGHT = 480
+
+SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 title = "PyPong"
-
-paddle_width = 10
-paddle_height = 80
-paddle_speed = 10
-
-pong_size = 10
 
 netwidth = 10
 
@@ -110,21 +126,10 @@ score_down = 20 # how far down the score text is placed on the screen
 score_text_size = 60 # size of the scoreboard text
 max_score = 10 # play until someone gets the max_score
 
-# pong initialization variables
-init_pong_x = width / 2
-init_pong_y = height / 2
 
-# Left paddle init variables
-init_l_paddle_x = 10
-init_l_paddle_y = (height / 2) - (paddle_height / 2)
-
-
-# Right paddle init variables
-init_r_paddle_x = width - (2*paddle_width)
-init_r_paddle_y = (height / 2) - (paddle_height / 2)
 
 # create the display
-screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption(title)
 
 # Create lists to hold the sprites
@@ -137,13 +142,13 @@ def paddle_bounce(paddle, pong):
     elif pong.x_speed < 0:
         pong.x_speed -=1
     pong.x_speed *= -1
-    if pong.rect.y < ( paddle_height/5 + paddle.rect.y ):
+    if pong.rect.y < ( paddle.height/5 + paddle.rect.y ):
         pong.y_speed = -5
-    elif pong.rect.y > (paddle_height/5 + paddle.rect.y) and pong.rect.y < (2 * (paddle_height/5) + paddle.rect.y ):
+    elif pong.rect.y > (paddle.height/5 + paddle.rect.y) and pong.rect.y < (2 * (paddle.height/5) + paddle.rect.y ):
         pong.y_speed = -3
-    elif pong.rect.y > (2 * (paddle_height/5) + paddle.rect.y ) and pong.rect.y < (3 * (paddle_height/5) + paddle.rect.y):
+    elif pong.rect.y > (2 * (paddle.height/5) + paddle.rect.y ) and pong.rect.y < (3 * (paddle.height/5) + paddle.rect.y):
         pong.y_speed = 0
-    elif pong.rect.y > (3 * (paddle_height/5) + paddle.rect.y) and pong.rect.y < (4 * (paddle_height/5) + paddle.rect.y):
+    elif pong.rect.y > (3 * (paddle.height/5) + paddle.rect.y) and pong.rect.y < (4 * (paddle.height/5) + paddle.rect.y):
         pong.y_speed = 3
     else:
         pong.y_speed = 5
@@ -156,31 +161,47 @@ def draw_score(paddle):
     return font.render(str(paddle.score), True, WHITE)
 
 def draw_net(screen):
-    pygame.draw.line(screen, GREY, [(width/2) - (netwidth/2), 0] , [(width/2) - (netwidth/2) , height], netwidth)
+    pygame.draw.line(screen, GREY, [(SCREEN_WIDTH/2) - (netwidth/2), 0] , [(SCREEN_WIDTH/2) - (netwidth/2) , SCREEN_HEIGHT], netwidth)
 
 def reset_all(pong, paddle1, paddle2):
-    pong.set_pong()
+    pong.reset_pos()
     paddle1.score = 0
     paddle2.score = 0
 
 
 # Create the pong
-pong = Pong(WHITE, pong_size, pong_size)
-pong.set_pong()
-all_sprites_list.add(pong)
+pong = Pong(WHITE, size=10)
+pong.reset_pos()
+
+
+def get_center_y(screen_height, paddle_height):
+    '''
+    Returns the y axis where object, if drawn, will sit on the center of screen
+    '''
+    return (screen_height / 2) - (paddle_height / 2)
+
+paddle_width = 10
+paddle_height = 80
+
+# Set initial position of paddle
+left_paddle_init_x = paddle_width # magic number ?
+left_paddle_init_y = get_center_y(SCREEN_HEIGHT, paddle_height)
+
+# Set initial position of paddle
+right_paddle_init_x = SCREEN_WIDTH - (2 * paddle_width) # magic number ?
+right_paddle_init_y = get_center_y(SCREEN_HEIGHT, paddle_height)
 
 # Create the left paddle
-left_paddle = Paddle(WHITE, paddle_width, paddle_height, init_l_paddle_x, init_l_paddle_y, paddle_speed)
-left_paddle.rect.x = init_l_paddle_x
-left_paddle.rect.y = init_l_paddle_y
-paddle_list.add(left_paddle)
-all_sprites_list.add(left_paddle)
+left_paddle = Paddle(paddle_x=left_paddle_init_x, paddle_y=left_paddle_init_y)
 
 # Create the right paddle
-right_paddle = Paddle(WHITE, paddle_width, paddle_height, init_r_paddle_x, init_r_paddle_y, paddle_speed)
-right_paddle.rect.x = init_r_paddle_x
-right_paddle.rect.y = init_r_paddle_y
+right_paddle = Paddle(paddle_x=right_paddle_init_x, paddle_y=right_paddle_init_y)
+
+# Group related sprite together
 paddle_list.add(right_paddle)
+paddle_list.add(left_paddle)
+all_sprites_list.add(pong)
+all_sprites_list.add(left_paddle)
 all_sprites_list.add(right_paddle)
 
 # set the scores for rendering for each paddle
@@ -204,7 +225,7 @@ while not done:
             left_paddle_score = draw_score(left_paddle)
             right_paddle_score = draw_score(right_paddle)
             '''
-            pong.set_pong()
+            pong.reset_pos()
             left_paddle.score = 0
             right_paddle.score = 0
             left_paddle_score = draw_score(left_paddle)
@@ -220,13 +241,14 @@ while not done:
         # move simultaneously
         
         elif event.type == pygame.KEYDOWN:
-            if pygame.key.get_pressed()[pygame.K_a]:
+            key = pygame.key.get_pressed()
+            if key[player_left_up]:
                     left_paddle.rect.y -= left_paddle.speed
-            if pygame.key.get_pressed()[pygame.K_z]:
+            if key[player_left_down]:
                     left_paddle.rect.y += left_paddle.speed
-            if pygame.key.get_pressed()[pygame.K_k]:
+            if key[player_right_up]:
                     right_paddle.rect.y -= right_paddle.speed
-            if pygame.key.get_pressed()[pygame.K_m]:
+            if key[player_right_down]:
                     right_paddle.rect.y += right_paddle.speed
 
 
@@ -243,22 +265,18 @@ while not done:
     elif pygame.sprite.collide_rect(pong, right_paddle):
         paddle_bounce(right_paddle, pong)
 
-    # if the pong hits the bottom of the screen
-    elif pong.rect.y >= height - pong_size:
-        pong.wall_bounce()
-        
-    # if the pong hits the top of the screen
-    elif pong.rect.y <= 0:
+    # if the pong hits top/bottom of the screen
+    if pong.rect.y >= SCREEN_HEIGHT - pong.size or pong.rect.y <= 0:
         pong.wall_bounce()
 
     # if the pong goes off the left, point for right paddle
-    elif pong.rect.x <= 0 - pong_size:
+    if pong.rect.x <= 0 - pong.size:
         right_paddle.add_point(1)
         right_paddle_score = draw_score(right_paddle)
         pong.score()
 
     # if the pong goes off the right, point for the left paddle
-    elif pong.rect.x >= width:
+    elif pong.rect.x >= SCREEN_WIDTH:
         left_paddle.add_point(1)
         left_paddle_score = draw_score(left_paddle)
         pong.score()
@@ -272,8 +290,8 @@ while not done:
     draw_net(screen)
     
     # draw the score
-    screen.blit(left_paddle_score, [width/4, score_down])
-    screen.blit(right_paddle_score, [3 * (width/4), score_down])
+    screen.blit(left_paddle_score, [SCREEN_WIDTH/4, score_down])
+    screen.blit(right_paddle_score, [3 * (SCREEN_WIDTH/4), score_down])
     
     # Draw all sprites
     all_sprites_list.draw(screen)
@@ -287,4 +305,3 @@ while not done:
 pygame.quit() #required to actually quit and close the window without hanging
 
 
-            
