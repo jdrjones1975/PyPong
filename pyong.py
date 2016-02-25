@@ -49,8 +49,10 @@ class Pong(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def set_pong(self):
-        self.rect.x = init_pong_x
-        self.rect.y = init_pong_y
+        '''
+        Reset pong to center of screen, give random x, y speed
+        '''
+        self.rect.x, self.rect.y = SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2
         self.x_speed = random.randrange(-2 , 3, 4) #random left or right needed here
         self.y_speed = random.randint(-5, 5) #random up or down
         
@@ -117,9 +119,6 @@ score_down = 20 # how far down the score text is placed on the screen
 score_text_size = 60 # size of the scoreboard text
 max_score = 10 # play until someone gets the max_score
 
-# pong initialization variables
-init_pong_x = SCREEN_WIDTH / 2
-init_pong_y = SCREEN_HEIGHT / 2
 
 # Left paddle init variables
 init_l_paddle_x = 10
