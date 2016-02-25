@@ -53,7 +53,7 @@ class Pong(pygame.sprite.Sprite):
         #Fetch the image rect.
         self.rect = self.image.get_rect()
 
-    def set_pong(self):
+    def reset_pos(self):
         '''
         Reset pong to center of screen, give random x, y speed
         '''
@@ -67,7 +67,7 @@ class Pong(pygame.sprite.Sprite):
         
     def score(self):
         point_score.play()
-        self.set_pong()
+        self.reset_pos()
 
 class Paddle(pygame.sprite.Sprite):
     '''
@@ -164,14 +164,14 @@ def draw_net(screen):
     pygame.draw.line(screen, GREY, [(SCREEN_WIDTH/2) - (netwidth/2), 0] , [(SCREEN_WIDTH/2) - (netwidth/2) , SCREEN_HEIGHT], netwidth)
 
 def reset_all(pong, paddle1, paddle2):
-    pong.set_pong()
+    pong.reset_pos()
     paddle1.score = 0
     paddle2.score = 0
 
 
 # Create the pong
 pong = Pong(WHITE, size=10)
-pong.set_pong()
+pong.reset_pos()
 all_sprites_list.add(pong)
 
 
@@ -225,7 +225,7 @@ while not done:
             left_paddle_score = draw_score(left_paddle)
             right_paddle_score = draw_score(right_paddle)
             '''
-            pong.set_pong()
+            pong.reset_pos()
             left_paddle.score = 0
             right_paddle.score = 0
             left_paddle_score = draw_score(left_paddle)
