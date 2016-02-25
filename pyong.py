@@ -95,10 +95,10 @@ player_left_down = pygame.K_z
 player_right_up = pygame.K_k
 player_right_down = pygame.K_m
 
-width = 640
-height = 480
+SCREEN_WIDTH = 640
+SCREEN_HEIGHT = 480
 
-size = (width, height)
+size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 title = "PyPong"
 
 paddle_width = 10
@@ -118,17 +118,17 @@ score_text_size = 60 # size of the scoreboard text
 max_score = 10 # play until someone gets the max_score
 
 # pong initialization variables
-init_pong_x = width / 2
-init_pong_y = height / 2
+init_pong_x = SCREEN_WIDTH / 2
+init_pong_y = SCREEN_HEIGHT / 2
 
 # Left paddle init variables
 init_l_paddle_x = 10
-init_l_paddle_y = (height / 2) - (paddle_height / 2)
+init_l_paddle_y = (SCREEN_HEIGHT / 2) - (paddle_height / 2)
 
 
 # Right paddle init variables
-init_r_paddle_x = width - (2*paddle_width)
-init_r_paddle_y = (height / 2) - (paddle_height / 2)
+init_r_paddle_x = SCREEN_WIDTH - (2*paddle_width)
+init_r_paddle_y = (SCREEN_HEIGHT / 2) - (paddle_height / 2)
 
 # create the display
 screen = pygame.display.set_mode(size)
@@ -163,7 +163,7 @@ def draw_score(paddle):
     return font.render(str(paddle.score), True, WHITE)
 
 def draw_net(screen):
-    pygame.draw.line(screen, GREY, [(width/2) - (netwidth/2), 0] , [(width/2) - (netwidth/2) , height], netwidth)
+    pygame.draw.line(screen, GREY, [(SCREEN_WIDTH/2) - (netwidth/2), 0] , [(SCREEN_WIDTH/2) - (netwidth/2) , SCREEN_HEIGHT], netwidth)
 
 def reset_all(pong, paddle1, paddle2):
     pong.set_pong()
@@ -252,7 +252,7 @@ while not done:
         paddle_bounce(right_paddle, pong)
 
     # if the pong hits the bottom of the screen
-    elif pong.rect.y >= height - pong_size:
+    elif pong.rect.y >= SCREEN_HEIGHT - pong_size:
         pong.wall_bounce()
         
     # if the pong hits the top of the screen
@@ -266,7 +266,7 @@ while not done:
         pong.score()
 
     # if the pong goes off the right, point for the left paddle
-    elif pong.rect.x >= width:
+    elif pong.rect.x >= SCREEN_WIDTH:
         left_paddle.add_point(1)
         left_paddle_score = draw_score(left_paddle)
         pong.score()
@@ -280,8 +280,8 @@ while not done:
     draw_net(screen)
     
     # draw the score
-    screen.blit(left_paddle_score, [width/4, score_down])
-    screen.blit(right_paddle_score, [3 * (width/4), score_down])
+    screen.blit(left_paddle_score, [SCREEN_WIDTH/4, score_down])
+    screen.blit(right_paddle_score, [3 * (SCREEN_WIDTH/4), score_down])
     
     # Draw all sprites
     all_sprites_list.draw(screen)
