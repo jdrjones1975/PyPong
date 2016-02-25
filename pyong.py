@@ -172,7 +172,6 @@ def reset_all(pong, paddle1, paddle2):
 # Create the pong
 pong = Pong(WHITE, size=10)
 pong.reset_pos()
-all_sprites_list.add(pong)
 
 
 def get_center_y(screen_height, paddle_height):
@@ -198,10 +197,11 @@ left_paddle = Paddle(paddle_x=left_paddle_init_x, paddle_y=left_paddle_init_y)
 # Create the right paddle
 right_paddle = Paddle(paddle_x=right_paddle_init_x, paddle_y=right_paddle_init_y)
 
-paddle_list.add(left_paddle)
-all_sprites_list.add(left_paddle)
-
+# Group related sprite together
 paddle_list.add(right_paddle)
+paddle_list.add(left_paddle)
+all_sprites_list.add(pong)
+all_sprites_list.add(left_paddle)
 all_sprites_list.add(right_paddle)
 
 # set the scores for rendering for each paddle
@@ -265,16 +265,12 @@ while not done:
     elif pygame.sprite.collide_rect(pong, right_paddle):
         paddle_bounce(right_paddle, pong)
 
-    # if the pong hits the bottom of the screen
-    elif pong.rect.y >= SCREEN_HEIGHT - pong.size:
-        pong.wall_bounce()
-        
-    # if the pong hits the top of the screen
-    elif pong.rect.y <= 0:
+    # if the pong hits top/bottom of the screen
+    if pong.rect.y >= SCREEN_HEIGHT - pong.size or pong.rect.y <= 0:
         pong.wall_bounce()
 
     # if the pong goes off the left, point for right paddle
-    elif pong.rect.x <= 0 - pong.size:
+    if pong.rect.x <= 0 - pong.size:
         right_paddle.add_point(1)
         right_paddle_score = draw_score(right_paddle)
         pong.score()
