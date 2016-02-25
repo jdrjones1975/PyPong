@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #learning pygame from programarcadegames.com
 #pong game
 
